@@ -1,70 +1,74 @@
-# # my-wordle
+# my-wordle
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A small browser-based Wordle clone built as a weekend hobby project. You get a fixed number of tries to guess a secret 5-letter word, with classic green / yellow / red feedback after each guess.
 
-## Available Scripts
+The repo is split into a React front-end (`client/`) and a tiny Express server (`server/`) that serves the built client in production.
 
-In the project directory, you can run:
+## How to play
 
-### `npm start`
+1. The app shows a grid of empty letter cells. The current cell is auto-focused.
+2. Type any letter A–Z. Focus advances to the next cell automatically; when you fill the last cell in a row, the guess is submitted and the row is evaluated.
+3. After each guess the cells are colored:
+   - **Green** — letter is correct and in the right position.
+   - **Yellow** — letter is in the word but in a different position.
+   - **Red** — letter is not in the word.
+4. You have as many attempts as there are letters in the word (5 attempts for the default 5-letter word). Solve it before you run out of rows to win. Use the refresh icon to start over.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+> Note: in this version the secret word is hardcoded to `APPLE` in `client/src/App.js`. There is commented-out code that integrates with the RapidAPI WordsAPI to fetch a random word — drop in your own API key to enable it.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tech stack
 
-### `npm test`
+React 17 (Create React App / react-scripts 5) on the client, Express 4 on the server, FontAwesome for icons, Axios for HTTP.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Getting started
 
-### `npm run build`
+Clone the repo and install both the root and client dependencies:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+git clone https://github.com/neeleshsaxena/my-wordle.git
+cd my-wordle
+npm install
+cd client && npm install && cd ..
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Run the React app in development (recommended for hacking)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+cd client
+npm start
+```
 
-### `npm run eject`
+This starts the CRA dev server on [http://localhost:3000](http://localhost:3000) with hot reload. The client's `package.json` already proxies API calls to `http://localhost:3001`, so you can run the Express server alongside it if you need to.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Run the production build via Express
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+npm run build   # builds the client into client/build
+npm start       # starts Express on http://localhost:3001
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The Express server (`server/index.js`) serves the static React build and falls back to `index.html` for client-side routes. The port can be overridden with the `PORT` environment variable.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Available scripts
 
-## Learn More
+Run from the repo root:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- `npm start` — starts the Express server (serves `client/build` on port 3001).
+- `npm run build` — installs client dependencies and produces a production build under `client/build`.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Run from inside `client/` (standard CRA scripts):
 
-### Code Splitting
+- `npm start` — CRA dev server on port 3000.
+- `npm run build` — production build.
+- `npm test` — Jest / React Testing Library in watch mode.
+- `npm run eject` — eject from Create React App (one-way).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Notes
 
-### Analyzing the Bundle Size
+- If `npm start` inside `client/` fails on a modern Node version with an OpenSSL / `digital envelope routines::unsupported` error (common on Node 17+ with older react-scripts), run it with the legacy provider flag:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+  ```bash
+  NODE_OPTIONS=--openssl-legacy-provider npm start
+  ```
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- To enable random words, uncomment the `axios` block in `client/src/App.js`, add your RapidAPI key/host, and remove the `setWord('APPLE')` line.
